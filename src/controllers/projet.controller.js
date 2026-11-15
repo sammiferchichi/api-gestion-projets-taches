@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Projet = require('../models/Projet');
-
+const Tache = require('../models/Tache');
 
 // Un projet est modifiable par son propriétaire OU par un manager
 const peutGerer = (projet, utilisateur) => {
@@ -133,6 +133,9 @@ const supprimerProjet = async (req, res) => {
       return res.status(403).json({ message: 'Accès refusé : ce projet ne vous appartient pas' });
     }
 
+    //await projet.deleteOne();
+    // kif yitfase5 projet yitfas5 zeda tache (suppression en cascade)
+    await Tache.deleteMany({ projet: projet._id });
     await projet.deleteOne();
 
     res.status(200).json({ message: 'Projet supprimé', id: projet._id });
