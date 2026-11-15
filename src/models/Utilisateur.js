@@ -49,3 +49,5 @@ utilisateurSchema.pre('save', async function () {
 utilisateurSchema.methods.verifierMotDePasse = async function (motDePasseSaisi) {
   return bcrypt.compare(motDePasseSaisi, this.motDePasse);
 };
+
+module.exports = mongoose.model('Utilisateur', utilisateurSchema);
