@@ -43,16 +43,36 @@ const creerProjet = async (req, res) => {
 
 // liste des projets 
 // Manager 3anndo tous les projets et  user 3ando seulement les siens
+// liste + recherche + tri 
 const listerProjets = async (req, res) => {
   try {
+    const { search, statut, sort, order } = req.query;
+
     const filtre =
       req.utilisateur.role === 'manager'
-        ? {}                                    // le manager voit tout
-        : { proprietaire: req.utilisateur._id }; // le user voit les siens
+        ? {}
+        : { proprietaire: req.utilisateur._id };
+
+
+    if (search) {
+      filtre.$or = [
+        { nom: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (statut) {
+      filtre.statut = statut;
+    }
+
+    // Tri 
+    const champsTriables = ['nom', 'statut', 'createdAt'];
+    const champ = champsTriables.includes(sort) ? sort : 'createdAt';
+    const sens = order === 'asc' ? 1 : -1; // -1 = décroissant (défaut)
 
     const projets = await Projet.find(filtre)
-      .populate('proprietaire', 'nom login')    // remplace l'id par { nom, login }
-      .sort({ createdAt: -1 });                 // les plus récents d'abord
+      .populate('proprietaire', 'nom login')
+      .sort({ [champ]: sens });
 
     res.status(200).json(projets);
   } catch (error) {
