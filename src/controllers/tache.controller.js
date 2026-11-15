@@ -81,14 +81,17 @@ const creerTache = async (req, res) => {
 
 
 
+// liste , recherche , tri 
 const listerTaches = async (req, res) => {
   try {
+    const { search, statut, projet, sort, order } = req.query;
+
+    
     let filtre;
 
     if (req.utilisateur.role === 'manager') {
-      filtre = {}; // le manager voit toutes les tâches
+      filtre = {};
     } else {
-      // un user voit les tâches de SES projets + celles qui lui sont affectées
       const mesProjets = await Projet.find({ proprietaire: req.utilisateur._id }).select('_id');
       filtre = {
         $or: [
@@ -98,17 +101,39 @@ const listerTaches = async (req, res) => {
       };
     }
 
+    //    On les met dans $and car $or est déjà pris par les droits d'accès
+    const conditions = [];
+
+    if (search) {
+      conditions.push({
+        $or: [
+          { titre: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
+    if (statut) conditions.push({ statut });
+    if (projet) conditions.push({ projet });
+
+    if (conditions.length > 0) {
+      filtre = { $and: [filtre, ...conditions] };
+    }
+
+    // Tri
+    const champsTriables = ['titre', 'statut', 'deadline', 'createdAt'];
+    const champ = champsTriables.includes(sort) ? sort : 'createdAt';
+    const sens = order === 'asc' ? 1 : -1;
+
     const taches = await Tache.find(filtre)
       .populate('projet', 'nom statut')
       .populate('assigneA', 'nom login')
-      .sort({ createdAt: -1 });
+      .sort({ [champ]: sens });
 
     res.status(200).json(taches);
   } catch (error) {
     erreurReponse(res, error);
   }
 };
-
 
 const obtenirTache = async (req, res) => {
   try {
