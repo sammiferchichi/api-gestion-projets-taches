@@ -21,7 +21,7 @@ const projetSchema = new mongoose.Schema(
     statut: {
       type: String,
       enum: {
-        values: ['en cours', 'terminé', 'en pause'],
+        values: ['en cours', 'termine', 'en pause'],
         message: 'Le statut doit être : en cours, terminé ou en pause',
       },
       default: 'en cours',
