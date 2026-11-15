@@ -36,3 +36,11 @@ const utilisateurSchema = new mongoose.Schema(
   }
 );
 
+
+// 9bal ay save : on crypte le mot de passe seulement s'il a été modifié
+
+utilisateurSchema.pre('save', async function () {
+  if (!this.isModified('motDePasse')) return; // sinon on re-hashe un hash
+  const salt = await bcrypt.genSalt(10);
+  this.motDePasse = await bcrypt.hash(this.motDePasse, salt);
+});
