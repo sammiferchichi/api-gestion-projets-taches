@@ -22,6 +22,9 @@ et les tâches associées.
 
 ## Choix d'architecture
 
+<img width="958" height="552" alt="image" src="https://github.com/user-attachments/assets/bbf397e9-4eee-488f-9b7f-5b91c5ce8abc" />
+
+
 Le projet suit une **architecture en couches** : présentation / logique / accès aux
 données. C'est un découpage classique des applications web, où chaque couche a
 une responsabilité unique.
