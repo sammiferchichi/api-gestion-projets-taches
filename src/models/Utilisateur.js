@@ -44,3 +44,8 @@ utilisateurSchema.pre('save', async function () {
   const salt = await bcrypt.genSalt(10);
   this.motDePasse = await bcrypt.hash(this.motDePasse, salt);
 });
+
+// comparer un mot de passe en clair avec le hash stocké
+utilisateurSchema.methods.verifierMotDePasse = async function (motDePasseSaisi) {
+  return bcrypt.compare(motDePasseSaisi, this.motDePasse);
+};
