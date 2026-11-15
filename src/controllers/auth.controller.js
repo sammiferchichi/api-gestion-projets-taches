@@ -64,5 +64,8 @@ const login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-module.exports = { register, login };
+// renvoie l'utilisateur connecté
+const me = async (req, res) => {
+  res.status(200).json(req.utilisateur);
+};
+module.exports = { register, login ,me };
